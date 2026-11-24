@@ -26,14 +26,18 @@ export function OrderItems({ items }) {
     );
 }
 
-export function ShippingSummary({ address }) {
+export function ShippingSummary({ address, editable }) {
     return (
         <section className="card-body">
-            <h2>Shipping address</h2>
+            <div className="order-heading-line">
+                <h2>Shipping address</h2>
+                {editable && <Link className="rating-signin" to="/shipping">Edit address</Link>}
+            </div>
             <address>
                 <strong>{address.fullName}</strong><br />
                 {address.address}<br />
-                {address.city}, {address.postalcode}<br />
+                {address.addressLine2 && <>{address.addressLine2}<br /></>}
+                {[address.city, address.region, address.postalcode].filter(Boolean).join(', ')}<br />
                 {address.country}
             </address>
         </section>

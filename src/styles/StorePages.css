@@ -216,3 +216,7 @@ button:disabled { opacity: .55; cursor: default; }
 .password-rules .met { color: #176545; }
 .account-field-error { color: #a52632; font-size: .875rem; }
 .password-input input[aria-invalid="true"] { border-color: #a52632; }
+
+.shipping-fields { border: 0; min-width: 0; }
+.shipping-fields .order-payment-note { margin: 0; }
+.shipping-fields input[aria-invalid="true"] { border-color: #a52632; }

@@ -64,7 +64,7 @@ export default function PlaceOrder({ history }) {
                 ) : !quote ? <LoadingBox /> : (
                     <div className="row-container">
                         <div className="order-panel-stack">
-                            <ShippingSummary address={shippingAddress} />
+                            <ShippingSummary address={shippingAddress} editable />
                             <OrderItems items={quote.orderItems} />
                         </div>
                         <OrderSummary order={quote}>

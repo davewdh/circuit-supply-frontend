@@ -1,103 +1,85 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import axios from '../Axios';
 import { saveShippingAddress } from '../actions/CartAction';
-import CheckoutSteps from '../components/CheckoutSteps'
+import CheckoutSteps from '../components/CheckoutSteps';
+import MessageBox from '../components/MessageBox';
 
-const ShippingAddress = (props) => {
+const shippingFields = [
+    { name: 'fullName', label: 'Full name', autoComplete: 'shipping name', maxLength: 100 },
+    { name: 'address', label: 'Street address', autoComplete: 'shipping address-line1', maxLength: 150 },
+    { name: 'addressLine2', label: 'Apartment or suite (optional)', autoComplete: 'shipping address-line2', maxLength: 80 },
+    { name: 'city', label: 'City or town', autoComplete: 'shipping address-level2', maxLength: 100 },
+    { name: 'region', label: 'Province, territory, or state', autoComplete: 'shipping address-level1', maxLength: 100 },
+    { name: 'postalcode', label: 'Postal or ZIP code', autoComplete: 'shipping postal-code', maxLength: 20 },
+    { name: 'country', label: 'Country', autoComplete: 'shipping country-name', maxLength: 100 },
+];
 
-    const userSignin = useSelector( (state) => state.userSignin);
-    const {userInfo} = userSignin;
-    const cart = useSelector( (state) => state.cart);
-    const {shippingAddress} = cart;
-
-    if(!userInfo) {
-        props.history.push('/signin');
-    }
-
-    const [fullName, setFullName] = useState(shippingAddress.fullName);
-    const [address, setAddress] = useState(shippingAddress.address);
-    const [city, setCity] = useState(shippingAddress.city);
-    const [postalcode, setPostalCode] = useState(shippingAddress.postalcode);
-    const [country, setCountry] = useState(shippingAddress.country);
-
-
+export default function ShippingAddress({ history }) {
     const dispatch = useDispatch();
+    const { userInfo } = useSelector(state => state.userSignin);
+    const { shippingAddress } = useSelector(state => state.cart);
+    const [pending, setPending] = useState(false);
+    const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
 
-    const submitHandler = (e) =>{
-        e.preventDefault();
+    if (!userInfo) return <Redirect to="/signin?redirect=/shipping" />;
 
-        dispatch(saveShippingAddress({
-            fullName,
-            address,
-            city,
-            postalcode,
-            country
-        }));
-
-        props.history.push('/payment');
+    async function submit(event) {
+        event.preventDefault();
+        if (pending) return;
+        setError('');
+        setFieldErrors({});
+        const address = Object.fromEntries(new FormData(event.currentTarget));
+        setPending(true);
+        try {
+            const { data } = await axios.post('/api/orders/shipping-address', { shippingAddress: address }, {
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+            });
+            dispatch(saveShippingAddress(data.address));
+            history.push('/payment');
+        } catch (error) {
+            const response = error.response?.data;
+            setError(response?.message || 'We couldn’t check the address. Try again.');
+            setFieldErrors(response?.fields || {});
+        } finally {
+            setPending(false);
+        }
     }
 
     return (
-        <div>
-            <CheckoutSteps step1 step2></CheckoutSteps>
-
-            <div className="shipping-form-container">
-                <form className="form" onSubmit={submitHandler}>
-                    <div>
-                        <h1>Shipping Address</h1>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="fullName">Full name:</label>
-                        <input type="text" id="fullName" placeholder="Enter full name"
-                        value={fullName} onChange={(e) => setFullName(e.target.value)}
-                        required>
-                        </input>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="address">Address:</label>
-                        <input type="text" id="address" placeholder="Enter address"
-                        value={address} onChange={(e) => setAddress(e.target.value)}
-                        required>
-                        </input>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="city">City:</label>
-                        <input type="text" id="city" placeholder="Enter city"
-                        value={city} onChange={(e) => setCity(e.target.value)}
-                        required>
-                        </input>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="postalcode">Postal Code:</label>
-                        <input type="text" id="postalcode" placeholder="Enter postalcode"
-                        value={postalcode} onChange={(e) => setPostalCode(e.target.value)}
-                        required>
-                        </input>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="country">Country:</label>
-                        <input type="text" id="country" placeholder="Enter country"
-                        value={country} onChange={(e) => setCountry(e.target.value)}
-                        required>
-                        </input>
-                    </div>
-
-                    <div>
-                        <label/>
-                        <button type="submit" className="continue-btn">
-                            Continue
-                        </button>
-                    </div>
+        <>
+            <CheckoutSteps step1 step2 />
+            <main className="shipping-form-container">
+                <form className="form" onSubmit={submit} aria-busy={pending}>
+                    <h1>Shipping address</h1>
+                    {error && <MessageBox variant="danger">{error}</MessageBox>}
+                    <fieldset className="shipping-fields" disabled={pending}>
+                        {shippingFields.map(({ name, label, autoComplete, maxLength }) => {
+                            const id = 'shipping-' + name;
+                            const issue = fieldErrors[name];
+                            return (
+                                <div className="form-ip-sec" key={name}>
+                                    <label htmlFor={id}>{label}</label>
+                                    <input id={id} name={name} autoComplete={autoComplete} maxLength={maxLength}
+                                        defaultValue={shippingAddress?.[name] || ''}
+                                        aria-invalid={issue ? true : undefined}
+                                        aria-describedby={issue ? id + '-error' : name === 'region' ? 'shipping-region-hint' : undefined}
+                                        onChange={() => setFieldErrors(errors => ({ ...errors, [name]: undefined }))} />
+                                    {name === 'region' && <p className="order-payment-note" id="shipping-region-hint">
+                                        For Canada and the U.S., use the two-letter abbreviation, such as ON or NY.
+                                    </p>}
+                                    {issue && <p className="account-field-error" id={id + '-error'}>{issue}</p>}
+                                </div>
+                            );
+                        })}
+                    </fieldset>
+                    <button type="submit" className="continue-btn" disabled={pending}>
+                        {pending ? 'Checking address…' : 'Continue'}
+                    </button>
                 </form>
-            </div>
-
-        </div>
-    )
+            </main>
+        </>
+    );
 }
-
-export default ShippingAddress
