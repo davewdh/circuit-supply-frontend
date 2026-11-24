@@ -1,6 +1,10 @@
 import { CART_ADD_ITEM, CART_EMPTY, CART_REMOVE_ITEM, CART_SAVE_PAYMENT_METHOD, CART_SAVE_SHIPPING_ADDRESS } from "../constants/CartConstant";
 
-export const cartReducer = (state = {cartItems: []} ,action) => {
+import { USER_SIGNOUT } from '../constants/UserConstant';
+
+export const emptyCart = { cartItems: [], shippingAddress: {}, paymentMethod: 'PayPal' };
+
+export const cartReducer = (state = emptyCart, action) => {
     switch(action.type){
 
         case CART_ADD_ITEM:
@@ -38,6 +42,9 @@ export const cartReducer = (state = {cartItems: []} ,action) => {
                 paymentMethod : action.payload
             }
         
+        case USER_SIGNOUT:
+            return emptyCart;
+
         case CART_EMPTY:
             return {
                 ...state,

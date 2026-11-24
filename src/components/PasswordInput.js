@@ -11,7 +11,7 @@ export const passwordRules = [
 export function checkNewPassword(value, confirmation) {
     if (typeof value !== 'string' || value !== confirmation) return 'Passwords do not match.';
     if (passwordRules.some(([, check]) => !check(value))) return 'Meet all five password requirements.';
-    if (new TextEncoder().encode(value).length > 72) return 'Password must use 72 UTF-8 bytes or fewer.';
+    if (new Blob([value]).size > 72) return 'Password must use 72 UTF-8 bytes or fewer.';
     return '';
 }
 
