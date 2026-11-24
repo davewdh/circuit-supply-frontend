@@ -189,3 +189,30 @@ button:disabled { opacity: .55; cursor: default; }
 @media (max-width: 460px) {
     .order-timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.password-input { display: flex; align-items: center; position: relative; }
+.password-input input { width: 100%; padding-right: 76px; }
+.password-input button {
+    position: absolute;
+    inset-inline-end: 5px;
+    min-height: 36px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 6px;
+    background: #edf3fc;
+    color: var(--accent);
+    font-weight: 650;
+    cursor: pointer;
+}
+.password-rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 4px 10px;
+    list-style: none;
+    margin: 4px 0;
+    color: var(--muted);
+    font-size: .875rem;
+}
+.password-rules .met { color: #176545; }
+.account-field-error { color: #a52632; font-size: .875rem; }
+.password-input input[aria-invalid="true"] { border-color: #a52632; }

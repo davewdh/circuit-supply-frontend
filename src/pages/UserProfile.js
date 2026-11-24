@@ -1,124 +1,82 @@
-import React, {useEffect, useState} from 'react'
-import {useDispatch, useSelector} from 'react-redux'
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { detailsUser, updateUserProfile } from '../actions/USerAction';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
+import PasswordInput, { checkNewPassword } from '../components/PasswordInput';
 import { USER_UPDATE_PROFILE_RESET } from '../constants/UserConstant';
 
-const UserProfile = () => {
-
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmpassword, setConfirmPassword] = useState('');
-    
-    const userSignin = useSelector((state) => state.userSignin);
-    const userDetails = useSelector((state) => state.userDetails);
-    const userUpdateProfile = useSelector((state)=>state.userUpdateProfile);
-
-    const {userInfo} = userSignin;
-    const {loading,error,user} = userDetails;
-    const {
-        success: successUpdate,
-        error: errorUpdate,
-        loading: loadingUpdate
-    } = userUpdateProfile;
-
+export default function UserProfile() {
     const dispatch = useDispatch();
+    const { userInfo } = useSelector(state => state.userSignin);
+    const { loading, error, user } = useSelector(state => state.userDetails);
 
     useEffect(() => {
-        if(!user){
-            dispatch({
-                type: USER_UPDATE_PROFILE_RESET
-            })
-           dispatch(detailsUser(userInfo._id)); 
-        }
-        else{
-            setName(user.name);
-            setEmail(user.email);
-        }
-        
-    }, [dispatch, userInfo._id,user]);
+        dispatch({ type: USER_UPDATE_PROFILE_RESET });
+        dispatch(detailsUser(userInfo._id));
+    }, [dispatch, userInfo._id]);
 
+    return (
+        <main className="user-dets-container">
+            {error ? <MessageBox variant="danger">{error}</MessageBox> :
+                loading || user?._id !== userInfo._id ? <LoadingBox /> : <ProfileForm user={user} />}
+        </main>
+    );
+}
 
-    const updateDetails = (e) =>{
-        e.preventDefault();
+function ProfileForm({ user }) {
+    const dispatch = useDispatch();
+    const { success, loading, error } = useSelector(state => state.userUpdateProfile);
+    const [name, setName] = useState(user.name);
+    const [email, setEmail] = useState(user.email);
+    const [password, setPassword] = useState('');
+    const [confirmation, setConfirmation] = useState('');
+    const [fieldError, setFieldError] = useState('');
 
-        if(password !== confirmpassword){
-            alert('Password does not match.')
+    useEffect(() => {
+        if (success) {
+            setPassword('');
+            setConfirmation('');
         }
-        else{
-            dispatch(updateUserProfile({
-                userId: user._id,
-                name,
-                email,
-                password
-            }));
-        }
+    }, [success]);
+
+    function submit(event) {
+        event.preventDefault();
+        if (loading) return;
+        const issue = password || confirmation ? checkNewPassword(password, confirmation) : '';
+        setFieldError(issue);
+        if (!issue) dispatch(updateUserProfile({ name: name.trim(), email: email.trim(), password }));
     }
 
     return (
-        <div className="user-dets-container">
-           <form className="form" onSubmit={updateDetails}>
-            <h1>User Profile</h1>
-            {
-                loading? <LoadingBox></LoadingBox>
-                :
-                error? (
-                    <MessageBox variant="danger">{error}</MessageBox>
-                )
-                :
-                (
-                    <>
-                    {loading && <LoadingBox></LoadingBox>}
-                    {errorUpdate && <MessageBox variant="danger"></MessageBox>}
-                    {successUpdate && <MessageBox variant="success">Profile updated successfully.</MessageBox>}
-                    <div className="form-ip-sec">
-                        <label htmlFor="name">Name:</label>
-                        <input type="name" id="name"
-                        placeholder="Enter name"
-                        value={name}
-                        onChange={(e)=> setName(e.target.value)}>
-                        </input>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="email">E-mail:</label>
-                        <input type="email" id="email"
-                        placeholder="Enter email"
-                        value={email}
-                        onChange={(e)=> setEmail(e.target.value)}>
-                        </input>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="password">Password:</label>
-                        <input type="password" id="password"
-                        placeholder="Enter password"
-                        onChange={(e)=> setPassword(e.target.value)}>
-                        </input>
-                    </div>
-
-                    <div className="form-ip-sec">
-                        <label htmlFor="confirmpassword">Confirm password:</label>
-                        <input type="password" id="confirmpassword"
-                        placeholder="Enter password"
-                        onChange={(e)=> setConfirmPassword(e.target.value)}>
-                        </input>
-                    </div>
-
-                    <div>
-                    <label/>
-                    <button className="update-btn" type="submit">
-                        Update Details
-                    </button>
-                </div>
-                    </>
-                )
-            }
-            </form> 
-        </div>
-    )
+        <form className="form" aria-busy={Boolean(loading)} onSubmit={submit}
+            onChange={() => {
+                setFieldError('');
+                if (success || error) dispatch({ type: USER_UPDATE_PROFILE_RESET });
+            }}>
+            <h1>Your profile</h1>
+            {error && <MessageBox variant="danger">{error}</MessageBox>}
+            {success && <MessageBox variant="success">Profile updated.</MessageBox>}
+            <div className="form-ip-sec">
+                <label htmlFor="profile-name">Full name</label>
+                <input id="profile-name" autoComplete="name" required maxLength={100}
+                    value={name} onChange={event => setName(event.target.value)} />
+            </div>
+            <div className="form-ip-sec">
+                <label htmlFor="profile-email">Email address</label>
+                <input id="profile-email" type="email" autoComplete="email" required maxLength={254}
+                    value={email} onChange={event => setEmail(event.target.value)} />
+            </div>
+            <p className="order-payment-note">Leave the password fields blank to keep your current password.</p>
+            <PasswordInput id="profile-password" label="New password" autoComplete="new-password"
+                rules={Boolean(password)} value={password} onChange={setPassword}
+                error={fieldError !== 'Passwords do not match.' ? fieldError : undefined} />
+            <PasswordInput id="profile-confirmation" label="Confirm new password" autoComplete="new-password"
+                value={confirmation} onChange={setConfirmation}
+                error={fieldError === 'Passwords do not match.' ? fieldError : undefined} />
+            <button className="update-btn" type="submit" disabled={loading}>
+                {loading ? 'Saving changes…' : 'Save changes'}
+            </button>
+        </form>
+    );
 }
-
-export default UserProfile

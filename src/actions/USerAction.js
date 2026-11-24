@@ -3,8 +3,7 @@ import axios from "../Axios"
 
 export const register = (name,email,password) => async(dispatch) => {
     dispatch({
-        type: USER_REGISTER_REQUEST,
-        payload: {email, password}
+        type: USER_REGISTER_REQUEST
     });
     try{
         const {data} = await axios.post('/api/users/register', {name,email, password});
@@ -31,8 +30,7 @@ export const register = (name,email,password) => async(dispatch) => {
 
 export const signin = (email,password) => async(dispatch) => {
     dispatch({
-        type: USER_SIGNIN_REQUEST,
-        payload: {email, password}
+        type: USER_SIGNIN_REQUEST
     });
     try{
         const {data} = await axios.post('/api/users/signin', {email, password});
@@ -82,7 +80,7 @@ export const detailsUser = (userId) => async (dispatch, getState) => {
 };
 
 export const updateUserProfile = (user) => async (dispatch, getState) => {
-  dispatch({ type: USER_UPDATE_PROFILE_REQUEST, payload: user });
+  dispatch({ type: USER_UPDATE_PROFILE_REQUEST });
   const {
     userSignin: { userInfo },
   } = getState();
