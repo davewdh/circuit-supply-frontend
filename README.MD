@@ -6,7 +6,7 @@
   </p>
 <hr>
 
-## Clone Amazon 
+## Circuit Supply Storefront
 
-- 📦 [Repository](https://github.com/davewdh/clone-amazon-frontend)
-- 🖥 [Site](https://clone-amazon-ij40.onrender.com)
+- 📦 [Repository](https://github.com/davewdh/circuit-supply-frontend)
+- 🖥 [Site](https://circuit-supply-frontend.onrender.com)
