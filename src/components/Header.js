@@ -9,10 +9,10 @@ import { signout } from '../actions/USerAction';
 import '../styles/Header.css';
 
 const categories = [
-    ['accessories', 'Accessories'],
-    ['monitor', 'Monitors'],
     ['laptop', 'Laptops'],
+    ['monitor', 'Monitors'],
     ['earphones', 'Audio'],
+    ['accessories', 'Accessories'],
 ];
 
 const Header = () => {
