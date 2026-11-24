@@ -68,7 +68,7 @@ export default function ShippingAddress({ history }) {
                                         aria-describedby={issue ? id + '-error' : name === 'region' ? 'shipping-region-hint' : undefined}
                                         onChange={() => setFieldErrors(errors => ({ ...errors, [name]: undefined }))} />
                                     {name === 'region' && <p className="order-payment-note" id="shipping-region-hint">
-                                        For Canada and the U.S., use the two-letter abbreviation, such as ON or NY.
+                                        Enter the full name or abbreviation, such as Ontario or ON.
                                     </p>}
                                     {issue && <p className="account-field-error" id={id + '-error'}>{issue}</p>}
                                 </div>
