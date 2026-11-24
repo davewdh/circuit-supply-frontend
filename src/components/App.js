@@ -46,7 +46,7 @@ const App = () => {
             <footer className="store-footer">
                 <div>
                     <Link to="/" className="store-footer-brand">Circuit Supply</Link>
-                    <span>Portfolio storefront</span>
+                    <span>© {new Date().getFullYear()} Circuit Supply</span>
                     <nav aria-label="Footer">
                         <Link to="/">Catalog</Link>
                         <Link to="/cart">Cart</Link>
