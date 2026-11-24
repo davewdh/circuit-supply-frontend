@@ -1,3 +1,4 @@
+import CatalogImage from '../components/CatalogImage';
 import React,{useEffect} from 'react'
 import { useDispatch,useSelector } from 'react-redux';
 import { addToCart,removeFromCart } from '../actions/CartAction';
@@ -53,9 +54,7 @@ const Cart = (props) => {
                                     <li key={item.product}>
                                         <div className="row1">
                                             <div className="small">
-                                                <img src={item.image}
-                                                alt= ""
-                                                ></img>
+                                                <CatalogImage src={item.image} />
                                             </div>
 
                                             <div className="min-30">

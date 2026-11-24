@@ -1,3 +1,4 @@
+import CatalogImage from '../components/CatalogImage';
 import React, { useState,useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import CheckoutSteps from '../components/CheckoutSteps'
@@ -89,9 +90,7 @@ const PlaceOrder = (props) => {
                                         <li key={item.product}>
                                             <div className="row1 order-row1">
                                                 <div className="small">
-                                                    <img src={item.image}
-                                                    alt= ""
-                                                    ></img>
+                                                    <CatalogImage src={item.image} />
                                                 </div>
                                     
                                                 <div className="min-30">

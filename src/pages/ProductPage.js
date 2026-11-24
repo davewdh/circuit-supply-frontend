@@ -1,3 +1,4 @@
+import CatalogImage from '../components/CatalogImage';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -24,7 +25,7 @@ export default function ProductPage({ match, history }) {
             {loading ? <LoadingBox /> : error ? <MessageBox variant="danger">{error}</MessageBox> : (
                 <article className="product-detail-grid">
                     <div className="product-detail-image">
-                        <img src={product.image} alt={product.name} />
+                        <CatalogImage src={product.image} alt={product.name} loading="eager" />
                     </div>
                     <div className="product-detail-info">
                         <p className="product-detail-category">{product.category}</p>
