@@ -1,157 +1,92 @@
-import CatalogImage from '../components/CatalogImage';
-import React, { useState,useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import CheckoutSteps from '../components/CheckoutSteps'
-import { Link } from 'react-router-dom'
-import { createdOrder } from '../actions/OrderAction'
-import { ORDER_CREATE_RESET } from '../constants/OrderConstant'
-import LoadingBox from "../components/LoadingBox"
-import MessageBox from "../components/MessageBox"
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, Redirect } from 'react-router-dom';
+import CheckoutSteps from '../components/CheckoutSteps';
+import LoadingBox from '../components/LoadingBox';
+import MessageBox from '../components/MessageBox';
+import { OrderItems, OrderSummary, ShippingSummary } from '../components/OrderSummary';
+import { createdOrder } from '../actions/OrderAction';
+import { ORDER_CREATE_RESET } from '../constants/OrderConstant';
+import axios from '../Axios';
 
-const PlaceOrder = (props) => {
-
-    const cart = useSelector((state) => state.cart);
-
-    if(!cart.paymentMethod) {
-        props.history.push('/payment');
-    }
-
-    const orderCreate = useSelector((state) => state.orderCreate);
-    const {loading, success, error, order} = orderCreate;
-
-    const toPrice = (num) => Number(
-        num.toFixed(2) // 5.123 => "5.12" => 5.12
-    );
-
-    cart.itemsPrice = toPrice(cart.cartItems.reduce(
-        (a,c) => a+c.qty * c.price, 0
-    ));
-
-    cart.shippingPrice = cart.itemsPrice > 100 ? toPrice(0) : toPrice(10);
-
-    cart.taxPrice = toPrice(0.15 * cart.itemsPrice);
-    cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
-
+export default function PlaceOrder({ history }) {
     const dispatch = useDispatch();
-
-    const placeOrder = () =>{
-        dispatch(createdOrder({...cart, orderItems: cart.cartItems}));
-    }
-
+    const { cartItems, shippingAddress, paymentMethod } = useSelector(state => state.cart);
+    const { userInfo } = useSelector(state => state.userSignin);
+    const { loading, success, error, order } = useSelector(state => state.orderCreate);
+    const [checkoutId] = useState(() => window.crypto.randomUUID());
+    const [quote, setQuote] = useState(null);
+    const [quoteError, setQuoteError] = useState('');
+    const [refresh, setRefresh] = useState(0);
 
     useEffect(() => {
-        if(success){
-            props.history.push(`/order/${order._id}`);
-            dispatch({
-                type: ORDER_CREATE_RESET
-            });
+        if (!userInfo || !shippingAddress?.address || !paymentMethod || !cartItems.length) return;
+        let active = true;
+        setQuote(null);
+        setQuoteError('');
+
+        axios.post('/api/orders/quote', { orderItems: cartItems }, {
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+        }).then(({ data }) => {
+            if (active) setQuote(data);
+        }).catch(error => {
+            if (active) setQuoteError(error.response?.data?.message || 'Unable to load the order summary.');
+        });
+
+        return () => { active = false; };
+    }, [cartItems, paymentMethod, refresh, shippingAddress, userInfo]);
+
+    useEffect(() => {
+        if (success) {
+            history.replace('/order/' + order._id);
+            dispatch({ type: ORDER_CREATE_RESET });
         }
-        
-    }, [dispatch, order, props.history, success])
+    }, [dispatch, history, order, success]);
+
+    if (success) return <LoadingBox />;
+    if (!userInfo) return <Redirect to="/signin?redirect=/placeorder" />;
+    if (!cartItems.length) return <Redirect to="/cart" />;
+    if (!shippingAddress?.address) return <Redirect to="/shipping" />;
+    if (!paymentMethod) return <Redirect to="/payment" />;
+
+    const priceChanged = quote?.orderItems.some((item, index) => item.price !== cartItems[index].price);
 
     return (
-        <div>
-            <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
-
+        <>
+            <CheckoutSteps step1 step2 step3 step4 />
             <main className="page-shell">
-            <h1 className="order-review-title">Review your order</h1>
-            <div className="row-container">
-                <div className="col-6">
-                    <ul>
-                        <li>
-                            <div className="card-body">
-                                <h2>Shipping</h2>
-                                <p>
-                                    <strong>Name:</strong> {cart.shippingAddress.fullName}
-                                </p>
-                                <p>
-                                    <strong>Address: </strong> {cart.shippingAddress.address},
-                                    {cart.shippingAddress.city},{cart.shippingAddress.postalcode},
-                                    {cart.shippingAddress.country}
-                                </p>
-                            </div>
-                        </li>
-
-                        <li>
-                            <div className="card-body">
-                                <h2>Payment Method</h2>
-                                <p>
-                                    <strong>Method: </strong> {cart.paymentMethod} <br/>
-                                </p>
-                            </div>
-                        </li>
-
-                        <li>
-                            <div className="card-body">
-                                <h2>Order Items</h2>
-                                <ul>
-                                {
-                                    cart.cartItems.map((item)=>(
-                                        <li key={item.product}>
-                                            <div className="row1 order-row1">
-                                                <div className="small">
-                                                    <CatalogImage src={item.image} />
-                                                </div>
-                                    
-                                                <div className="min-30">
-                                                    <Link to={`/products/product/${item.product}`}>{item.name}</Link>
-                                                </div>
-                                                
-                                                <p>{item.qty} x ${item.price} = ${item.price*item.qty}</p>
-                                                
-                                            </div>
-                                        </li>
-                                    ))
-                                }
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <div className="col-7">
-                    <div className="card-body">
-                        <ul>
-                            <li>
-                                <h2>Order Summary</h2>
-                            </li>
-                            <li>
-                                <p>Items</p>
-                                <p>${cart.itemsPrice.toFixed(2)}</p>
-                            </li>
-                            <li>
-                                <p>Shipping</p>
-                                <p>${cart.shippingPrice.toFixed(2)}</p>
-                            </li>
-                            <li>
-                                <p>Tax</p>
-                                <p>${cart.taxPrice.toFixed(2)}</p>
-                            </li>
-                            <li>
-                                <p><strong>Total</strong></p>
-                                <p><strong>${cart.totalPrice.toFixed(2)}</strong></p>
-                            </li>
-
-                            <li>
-                                <button type="button" onClick={placeOrder}
-                                disabled = {cart.cartItems.length === 0}
-                                className="placeorder-btn">
-                                    Place order
-                                </button>
-                            </li>
-                            <li>
-                                {loading && <LoadingBox></LoadingBox>}
-                                {error && <MessageBox variant="danger">{error}</MessageBox>}
-                            </li>
-
-                            
-                        </ul>
+                <h1 className="order-review-title">Review your order</h1>
+                {quoteError ? (
+                    <>
+                        <MessageBox variant="danger">{quoteError}</MessageBox>
+                        <Link className="back-res order-return-link" to="/cart">Back to cart</Link>
+                    </>
+                ) : !quote ? <LoadingBox /> : (
+                    <div className="row-container">
+                        <div className="order-panel-stack">
+                            <ShippingSummary address={shippingAddress} />
+                            <OrderItems items={quote.orderItems} />
+                        </div>
+                        <OrderSummary order={quote}>
+                            {priceChanged && <MessageBox>Prices changed since you added items. The current prices are shown here.</MessageBox>}
+                            <p className="order-payment-note">Payment is through PayPal Sandbox.</p>
+                            <button className="store-primary order-action" type="button" disabled={loading}
+                                onClick={() => dispatch(createdOrder({ checkoutId, orderItems: quote.orderItems, shippingAddress, paymentMethod }))}>
+                                {loading ? 'Placing order…' : 'Place order'}
+                            </button>
+                            {error && (
+                                <>
+                                    <MessageBox variant="danger">{error}</MessageBox>
+                                    <button className="order-details-btn order-action" type="button" onClick={() => {
+                                        dispatch({ type: ORDER_CREATE_RESET });
+                                        setRefresh(value => value + 1);
+                                    }}>Refresh order summary</button>
+                                </>
+                            )}
+                        </OrderSummary>
                     </div>
-                </div>
-            </div>
-        </main>
-        </div>
-    )
+                )}
+            </main>
+        </>
+    );
 }
-
-export default PlaceOrder

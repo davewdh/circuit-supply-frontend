@@ -66,7 +66,12 @@ const Header = () => {
                             <div id="store-account-menu" className="store-account-menu" hidden={!accountOpen}>
                                 <Link to="/profile">Profile</Link>
                                 <Link to="/orderhistory">Order history</Link>
-                                {userInfo.isAdmin && <Link to="/productlist">Manage products</Link>}
+                                {userInfo.isAdmin && (
+                                    <>
+                                        <Link to="/admin/orders">Manage orders</Link>
+                                        <Link to="/productlist">Manage products</Link>
+                                    </>
+                                )}
                                 <Link to="/" onClick={() => dispatch(signout())}>Sign out</Link>
                             </div>
                         </div>

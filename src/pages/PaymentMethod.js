@@ -1,69 +1,29 @@
-import React, { useState } from 'react'
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { savePaymentMethod } from '../actions/CartAction';
-import CheckoutSteps from '../components/CheckoutSteps'
+import CheckoutSteps from '../components/CheckoutSteps';
 
-const PaymentMethod = (props) => {
-
-    const cart = useSelector((state) => state.cart);
-    const {shippingAddress} = cart;
-
-    if(!shippingAddress.address) {
-        props.history.push('/shipping');
-    }
-
-    const [method, setMethod] = useState('PayPal');
+export default function PaymentMethod({ history }) {
+    const { shippingAddress } = useSelector(state => state.cart);
     const dispatch = useDispatch();
-
-    const submitMethod = (e) => {
-        e.preventDefault();
-
-        dispatch(savePaymentMethod(method));
-        props.history.push('/placeorder');
-    } 
+    if (!shippingAddress?.address) return <Redirect to="/shipping" />;
 
     return (
-        <div>
-            <CheckoutSteps step1 step2 step3/>
-
-            <div className="pay-method-container">
-                <form className="form" onSubmit={submitMethod}>
-                    <div>
-                        <h1>Payment Method</h1>
-                    </div>
-
-                    <div className="select-method-ip">
-                        <input type="radio" id="paypal" value="PayPal"
-                            name="paymentMethod" required checked
-                            onChange = {(e) => setMethod(e.target.value)}>
-                        </input>
-                        <label htmlFor="paypal">
-                            PayPal
-                        </label>
-                    </div>
-
-                    <div className="select-method-ip">
-                        <input type="radio" id="stripe" value="Stripe"
-                            name="paymentMethod" required
-                            onChange = {(e) => setMethod(e.target.value)}>
-                        </input>
-                        <label htmlFor="stripe">
-                            Stripe
-                        </label>
-                    </div>
-
-                    <div>
-                        <label/>
-                        <button className="submit-btn" type="submit">
-                            Continue
-                        </button>
-                    </div>
-
-                    
+        <>
+            <CheckoutSteps step1 step2 step3 />
+            <main className="pay-method-container">
+                <form className="form" onSubmit={event => {
+                    event.preventDefault();
+                    dispatch(savePaymentMethod('PayPal'));
+                    history.push('/placeorder');
+                }}>
+                    <h1>Payment method</h1>
+                    <p>PayPal Sandbox</p>
+                    <p className="order-payment-note">Use a PayPal Sandbox account to try checkout without a real charge.</p>
+                    <button className="submit-btn" type="submit">Review order</button>
                 </form>
-            </div>
-        </div>
-    )
+            </main>
+        </>
+    );
 }
-
-export default PaymentMethod

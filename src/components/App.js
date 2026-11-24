@@ -16,6 +16,7 @@ import UserProfile from '../pages/UserProfile';
 import PrivateRoute from './PrivateRoute';
 import SearchResults from '../pages/SearchResults';
 import AllProducts from '../pages/Admin/AllProducts';
+import Orders from '../pages/Admin/Orders';
 import CategoryBasedPage from '../pages/CategoryBasedPage';
 
 const App = () => {
@@ -33,8 +34,9 @@ const App = () => {
                 <Route path="/shipping" component={ShippingAddress}></Route>
                 <Route path="/payment" component={PaymentMethod}></Route>
                 <Route path="/placeorder" component={PlaceOrder}></Route>
-                <Route path="/order/:id" component={OrderDetails}></Route>
-                <Route path="/orderhistory" component={OrderHistory}></Route>
+                <PrivateRoute exact path="/order/:id" component={OrderDetails} />
+                <PrivateRoute exact path="/orderhistory" component={OrderHistory} />
+                <PrivateRoute exact path="/admin/orders" component={Orders} />
                 <PrivateRoute path="/profile" component={UserProfile}></PrivateRoute>
                 <Route path="/searchresults/:query" component={SearchResults} exact></Route>
     
