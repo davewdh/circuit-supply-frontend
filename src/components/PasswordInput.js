@@ -9,9 +9,9 @@ export const passwordRules = [
 ];
 
 export function checkNewPassword(value, confirmation) {
+    if (typeof value !== 'string' || value !== confirmation) return 'Passwords do not match.';
     if (passwordRules.some(([, check]) => !check(value))) return 'Meet all five password requirements.';
     if (new TextEncoder().encode(value).length > 72) return 'Password must use 72 UTF-8 bytes or fewer.';
-    if (value !== confirmation) return 'Passwords do not match.';
     return '';
 }
 
@@ -20,14 +20,14 @@ export function accountRedirect(search) {
     return path && /^\/(?![/\\])[^\\\s]*$/.test(path) ? path : '/';
 }
 
-export default function PasswordInput({ id, label, value, onChange, autoComplete, required, rules, error }) {
+export default function PasswordInput({ id, name, label, value, onChange, autoComplete, required, rules, error }) {
     const [visible, setVisible] = useState(false);
 
     return (
         <div className="form-ip-sec">
             <label htmlFor={id}>{label}</label>
             <div className="password-input">
-                <input id={id} type={visible ? 'text' : 'password'} autoComplete={autoComplete}
+                <input id={id} name={name} type={visible ? 'text' : 'password'} autoComplete={autoComplete}
                     value={value} onChange={event => onChange(event.target.value)} required={required}
                     aria-invalid={error ? true : undefined}
                     aria-describedby={[rules && id + '-rules', error && id + '-error'].filter(Boolean).join(' ') || undefined} />

@@ -1,12 +1,12 @@
 import { USER_DETAILS_FAIL, USER_DETAILS_REQUEST, USER_DETAILS_SUCCESS, USER_REGISTER_FAIL, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_SIGNIN_FAIL, USER_SIGNIN_REQUEST, USER_SIGNIN_SUCCESS, USER_SIGNOUT, USER_UPDATE_PROFILE_FAIL, USER_UPDATE_PROFILE_REQUEST, USER_UPDATE_PROFILE_SUCCESS } from "../constants/UserConstant"
 import axios from "../Axios"
 
-export const register = (name,email,password) => async(dispatch) => {
+export const register = (name, email, password, passwordConfirmation) => async(dispatch) => {
     dispatch({
         type: USER_REGISTER_REQUEST
     });
     try{
-        const {data} = await axios.post('/api/users/register', {name,email, password});
+        const {data} = await axios.post('/api/users/register', { name, email, password, passwordConfirmation });
         dispatch({
             type: USER_REGISTER_SUCCESS,
             payload: data

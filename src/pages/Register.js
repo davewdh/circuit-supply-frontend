@@ -25,11 +25,14 @@ export default function Register({ location, history }) {
         event.preventDefault();
         if (loading) return;
         setSubmitted(false);
-        const issue = checkNewPassword(password, confirmation);
+        const values = new FormData(event.currentTarget);
+        const enteredPassword = values.get('password');
+        const passwordConfirmation = values.get('passwordConfirmation');
+        const issue = checkNewPassword(enteredPassword, passwordConfirmation);
         setFieldError(issue);
         if (issue) return;
         setSubmitted(true);
-        dispatch(register(name.trim(), email.trim(), password));
+        dispatch(register(name.trim(), email.trim(), enteredPassword, passwordConfirmation));
     }
 
     return (
@@ -48,10 +51,10 @@ export default function Register({ location, history }) {
                     <input id="register-email" type="email" autoComplete="username" maxLength={254} required
                         value={email} onChange={event => setEmail(event.target.value)} />
                 </div>
-                <PasswordInput id="register-password" label="Password" autoComplete="new-password"
+                <PasswordInput id="register-password" name="password" label="Password" autoComplete="new-password"
                     required rules value={password} onChange={setPassword}
                     error={fieldError !== 'Passwords do not match.' ? fieldError : undefined} />
-                <PasswordInput id="register-confirmation" label="Confirm password" autoComplete="new-password"
+                <PasswordInput id="register-confirmation" name="passwordConfirmation" label="Confirm password" autoComplete="new-password"
                     required value={confirmation} onChange={setConfirmation}
                     error={fieldError === 'Passwords do not match.' ? fieldError : undefined} />
                 <button className="submit-btn" type="submit" disabled={loading}>
