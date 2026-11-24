@@ -1,145 +1,96 @@
-import React, { useState } from 'react'
-import {Link} from 'react-router-dom';
-import '../styles/Header.css'
-import { useSelector, useDispatch } from 'react-redux';
-import { signout } from '../actions/USerAction';
-
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import React, { useEffect, useState } from 'react';
+import { Link, NavLink, useHistory, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
+import ShoppingCartOutlinedIcon from '@material-ui/icons/ShoppingCartOutlined';
+import MemoryIcon from '@material-ui/icons/Memory';
 import SearchIcon from '@material-ui/icons/Search';
+import { signout } from '../actions/USerAction';
+import '../styles/Header.css';
 
-const Header = (props) => {
+const categories = [
+    ['accessories', 'Accessories'],
+    ['monitor', 'Monitors'],
+    ['laptop', 'Laptops'],
+    ['earphones', 'Audio'],
+];
 
+const Header = () => {
     const dispatch = useDispatch();
-
-    const [dropdown, setDropDown] = useState(false);
-    const [secondDropdown, setSecondDropdown] = useState(false);
-
-
-    const showDropDown = () =>{
-        if(dropdown) setDropDown(false);
-        else setDropDown(true);
-    }
-
-    const showSecondDropDown = () =>{
-        if(secondDropdown) setSecondDropdown(false);
-        else setSecondDropdown(true);
-    }
-
-    const cart = useSelector((state) => state.cart);
-    const {cartItems} = cart;
-
-    const userSignin = useSelector((state) => state.userSignin);
-    const { userInfo } = userSignin;
-
-    const signOutHandler = () =>{
-        dispatch(signout());
-    }
-
+    const history = useHistory();
+    const location = useLocation();
+    const { cartItems } = useSelector(state => state.cart);
+    const { userInfo } = useSelector(state => state.userSignin);
     const [query, setQuery] = useState('');
+    const [accountOpen, setAccountOpen] = useState(false);
 
-    console.log(userInfo)
+    useEffect(() => {
+        setAccountOpen(false);
+    }, [location]);
+
+    const search = event => {
+        event.preventDefault();
+        const term = query.trim();
+        if (term) history.push('/searchresults/' + encodeURIComponent(term));
+    };
 
     return (
-        <header>
-            <div className="container">
-                <div className="inner-content">
-                    <div className="brand">
-                        <Link to="/">Amazon Clone</Link>
-                    </div>
-
-                    <div className="search-bar">
-                        <input className="search-input"
-                        onChange={(e)=> setQuery(e.target.value)}
+        <header className="store-header">
+            <div className="store-header-main">
+                <Link className="store-brand" to="/">
+                    <span className="store-brand-mark"><MemoryIcon aria-hidden="true" /></span>
+                    <span>Circuit Supply</span>
+                </Link>
+                <form className="store-search" role="search" onSubmit={search}>
+                    <SearchIcon aria-hidden="true" />
+                    <input
+                        aria-label="Search products"
                         placeholder="Search products"
-                        value={query}>
-                        </input>
-
-                        <div className="search-btn">
-                            <Link to={`/searchresults/${query}`}>
-                                <SearchIcon/>
-                            </Link>
+                        value={query}
+                        onChange={event => setQuery(event.target.value)}
+                    />
+                    <button type="submit">Search</button>
+                </form>
+                <div className="store-header-actions">
+                    {userInfo ? (
+                        <div className="store-account">
+                            <button type="button" className="store-action" aria-label="Account"
+                                aria-expanded={accountOpen} aria-controls="store-account-menu"
+                                onClick={() => setAccountOpen(open => !open)}
+                                onKeyDown={event => {
+                                    if (event.key === 'Escape') setAccountOpen(false);
+                                }}>
+                                <AccountCircleOutlinedIcon aria-hidden="true" />
+                                <span className="store-action-label">Account</span>
+                            </button>
+                            <div id="store-account-menu" className="store-account-menu" hidden={!accountOpen}>
+                                <Link to="/profile">Profile</Link>
+                                <Link to="/orderhistory">Order history</Link>
+                                {userInfo.isAdmin && <Link to="/productlist">Manage products</Link>}
+                                <Link to="/" onClick={() => dispatch(signout())}>Sign out</Link>
+                            </div>
                         </div>
-                        
-                    </div>
-
-                    <ul className="nav-links">
-                        <li>
-                            <Link to="/cart"><ShoppingCartIcon/>
-                                {
-                                    cartItems.length > 0 && 
-                                    (<p className="badge">{cartItems.length}</p>)
-                                }
-                            </Link>
-                        </li>
-                        <li>
-                            {
-                                userInfo ? (
-                                    <div className="header-dropdown">
-                                        
-                                        <p onClick={showDropDown}>
-                                            {userInfo.name}
-                                            <ArrowDropDownIcon/>
-                                        </p>
-
-                                        <ul className={ dropdown? 'dropdown-content show' : 'dropdown-content'}>
-                                            <li>
-                                               <Link to="/profile">Account</Link> 
-                                            </li>
-                                            <li>
-                                               <Link to="/orderhistory">Order History</Link> 
-                                            </li>
-                                            <li>
-                                               <Link to="/" onClick={signOutHandler}>Sign out</Link> 
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    
-                                ) :
-                                (
-                                    <Link to="/signin"><AccountCircleIcon/></Link>
-                                )
-                            }
-                            
-                        </li>
-
-                        {userInfo && userInfo.isAdmin && (
-                            <li>
-                                <div className="header-dropdown">
-                                    <p onClick={showSecondDropDown}>
-                                        Admin 
-                                        <ArrowDropDownIcon/>
-                                    </p>
-                            
-                                    <ul className={ secondDropdown? 'dropdown-content show' : 'dropdown-content'}>
-                                        
-                                        <li>
-                                           <Link to="/productlist">Products</Link> 
-                                        </li>
-                                          
-                                    </ul>
-                                </div>
-                            </li>
-                        )}
-                        
-                            
-                    </ul>
-                </div>
-
-                <div className="category-container">
-                    <ul>
-                        <li><Link to="/category/mobile">Mobile</Link></li>
-                        <li><Link to="/category/laptop">Laptop</Link></li>
-                        <li><Link to="/category/monitor">Monitor</Link></li>
-                        <li><Link to="/category/accessories">Computer Accessories</Link></li>
-                        <li><Link to="/category/earphones">Earphones</Link></li>
-                    </ul>
+                    ) : (
+                        <Link to="/signin" className="store-action" aria-label="Sign in">
+                            <AccountCircleOutlinedIcon aria-hidden="true" />
+                            <span className="store-action-label">Sign in</span>
+                        </Link>
+                    )}
+                    <Link to="/cart" className="store-action" aria-label={'Cart, ' + cartItems.length + ' product types'}>
+                        <ShoppingCartOutlinedIcon aria-hidden="true" />
+                        <span className="store-action-label">Cart</span>
+                        {cartItems.length > 0 && <span className="store-cart-count">{cartItems.length}</span>}
+                    </Link>
                 </div>
             </div>
+            <nav className="store-categories" aria-label="Product categories">
+                <NavLink exact to="/">All gear</NavLink>
+                {categories.map(([slug, label]) => (
+                    <NavLink key={slug} to={'/category/' + slug}>{label}</NavLink>
+                ))}
+            </nav>
         </header>
-    )
-}
+    );
+};
 
-export default Header
+export default Header;

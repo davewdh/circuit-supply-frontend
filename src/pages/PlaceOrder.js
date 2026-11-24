@@ -1,6 +1,5 @@
 import React, { useState,useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import "../styles/PlaceOrder.css"
 import CheckoutSteps from '../components/CheckoutSteps'
 import { Link } from 'react-router-dom'
 import { createdOrder } from '../actions/OrderAction'
@@ -53,6 +52,8 @@ const PlaceOrder = (props) => {
         <div>
             <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
 
+            <main className="page-shell">
+            <h1 className="order-review-title">Review your order</h1>
             <div className="row-container">
                 <div className="col-6">
                     <ul>
@@ -141,7 +142,7 @@ const PlaceOrder = (props) => {
                             </li>
                             <li>
                                 {loading && <LoadingBox></LoadingBox>}
-                                {error && <MessageBox variant="danger"></MessageBox>}
+                                {error && <MessageBox variant="danger">{error}</MessageBox>}
                             </li>
 
                             
@@ -149,6 +150,7 @@ const PlaceOrder = (props) => {
                     </div>
                 </div>
             </div>
+        </main>
         </div>
     )
 }

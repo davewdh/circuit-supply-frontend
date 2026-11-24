@@ -1,11 +1,9 @@
 import React, { useState,useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import "../styles/PlaceOrder.css"
 import { Link } from 'react-router-dom'
 import LoadingBox from "../components/LoadingBox"
 import MessageBox from "../components/MessageBox"
 import { detailsOrder, payOrder } from '../actions/OrderAction'
-import "../styles/OrderDetails.css"
 import axios from "../Axios"
 import {PayPalButton} from 'react-paypal-button-v2'
 import { ORDER_PAY_RESET } from '../constants/OrderConstant'
@@ -66,8 +64,8 @@ const OrderDetails = (props) => {
     return loading? (<LoadingBox></LoadingBox>):
     error? (<MessageBox variant="danger">{error}</MessageBox>)
     :(
-        <div>
-            <h3 id="order-id">Order ID: {order._id}</h3>
+        <main className="page-shell">
+            <h1 id="order-id">Order {order._id}</h1>
             <div className="row-container">
                 <div className="col-6">
                     <ul>
@@ -176,7 +174,7 @@ const OrderDetails = (props) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     )
 }
 

@@ -1,5 +1,4 @@
 import React from 'react'
-import "../styles/CheckoutSteps.css"
 
 const CheckoutSteps = (props) => {
     return (

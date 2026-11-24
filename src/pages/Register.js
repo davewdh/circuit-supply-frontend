@@ -4,7 +4,6 @@ import {Link} from 'react-router-dom'
 import { register} from '../actions/USerAction';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
-import "../styles/Register.css"
 
 const Register = (props) => {
 

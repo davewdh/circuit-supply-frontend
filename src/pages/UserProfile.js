@@ -4,7 +4,6 @@ import { detailsUser, updateUserProfile } from '../actions/USerAction';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { USER_UPDATE_PROFILE_RESET } from '../constants/UserConstant';
-import "../styles/UserProfile.css";
 
 const UserProfile = () => {
 

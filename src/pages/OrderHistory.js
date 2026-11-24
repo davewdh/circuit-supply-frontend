@@ -3,7 +3,6 @@ import {useDispatch, useSelector} from 'react-redux'
 import { listOrderMine } from '../actions/OrderAction'
 import LoadingBox from "../components/LoadingBox"
 import MessageBox from "../components/MessageBox"
-import "../styles/OrderHistory.css"
 import InfoIcon from '@material-ui/icons/Info';
 
 const OrderHistory = (props) => {

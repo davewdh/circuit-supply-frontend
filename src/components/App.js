@@ -1,6 +1,7 @@
 import React from 'react'
 import Header from './Header'
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import '../styles/StorePages.css'
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import Home from '../pages/Home';
 import ProductPage from '../pages/ProductPage'
 import Cart from '../pages/Cart';
@@ -42,6 +43,17 @@ const App = () => {
                 {/* Admin sectiojn routes */}
                 <Route path="/productlist" component={AllProducts}></Route>
             </Switch>
+            <footer className="store-footer">
+                <div>
+                    <Link to="/" className="store-footer-brand">Circuit Supply</Link>
+                    <span>Portfolio storefront</span>
+                    <nav aria-label="Footer">
+                        <Link to="/">Catalog</Link>
+                        <Link to="/cart">Cart</Link>
+                        <Link to="/orderhistory">Orders</Link>
+                    </nav>
+                </div>
+            </footer>
         </Router>
         </> 
     )

@@ -3,7 +3,6 @@ import { useDispatch,useSelector } from 'react-redux';
 import { addToCart,removeFromCart } from '../actions/CartAction';
 import { Link } from 'react-router-dom';
 import MessageBox from "../components/MessageBox";
-import "../styles/Cart.css"
 import CancelIcon from '@material-ui/icons/Cancel';
 
 
@@ -16,9 +15,8 @@ const Cart = (props) => {
 
     
     const cart = useSelector((state) => state.cart);
-    const { cartItems, error } = cart;
+    const { cartItems } = cart;
 
-    console.log(productID);
 
     const dispatch = useDispatch();
 
@@ -38,7 +36,7 @@ const Cart = (props) => {
     }
 
     return (
-        <div>
+        <main className="page-shell">
             <Link to="/" className="back-res">Back to home</Link>
 
             <div className="row-container">
@@ -64,20 +62,20 @@ const Cart = (props) => {
                                                 <Link to={`/products/product/${item.product}`}>{item.name}</Link>
                                             </div>
                                             <div className="qty-select">
-                                                <select value={item.qty} 
+                                                <select aria-label={'Quantity for ' + item.name} value={item.qty}
                                                 onChange={(e) => 
                                                 dispatch(addToCart(item.product,Number(e.target.value)))
                                                 }>
                                                 {
                                                     [...Array(item.stock).keys()].map((x)=>(
-                                                        <option value={x+1}>{x+1}</option>
+                                                        <option key={x+1} value={x+1}>{x+1}</option>
                                                     ))
                                                 }
                                                 </select>
                                             </div>
                                             <p>${item.price * item.qty}</p>
                                             <div className="remove-btn">
-                                                <button type="button" onClick={() => removeProduct(item.product)}>
+                                                <button type="button" aria-label={'Remove ' + item.name} onClick={() => removeProduct(item.product)}>
                                                     <CancelIcon/>
                                                 </button>
                                             </div>
@@ -114,8 +112,7 @@ const Cart = (props) => {
                 </div>
             </div>
 
-        </div>
-        
+        </main>
     )
 }
 

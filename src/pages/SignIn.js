@@ -4,7 +4,6 @@ import {Link} from 'react-router-dom'
 import { signin } from '../actions/USerAction';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
-import "../styles/SignIn.css"
 
 const SignIn = (props) => {
 

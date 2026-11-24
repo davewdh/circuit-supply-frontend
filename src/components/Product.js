@@ -7,14 +7,14 @@ import { Link } from 'react-router-dom'
 const Product = ({product}) => {
 
     return (
-        <Link to={`/products/product/${product._id}`}>
+        <Link className="product-card-link" to={`/products/product/${product._id}`}>
         <div className="product-card" >
             <div className="product-image">
-                <img src= {product.image} alt=""/>
+                <img src= {product.image} alt="" loading="lazy"/>
             </div>
             <h2>{product.name}</h2>
-            <Rating rating={product.rating} numRev={product.numRev}/>
-            <p>${product.price}</p>
+            {product.numRev > 0 && <Rating rating={product.rating} numRev={product.numRev} />}
+            <p>${Number(product.price).toFixed(2)}</p>
         </div>
         </Link>
     )

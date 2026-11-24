@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { saveShippingAddress } from '../actions/CartAction';
 import CheckoutSteps from '../components/CheckoutSteps'
-import "../styles/ShippingAddress.css"
 
 const ShippingAddress = (props) => {
 
