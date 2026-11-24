@@ -31,3 +31,10 @@
 @media (max-width: 760px) {
     .product-detail-grid { grid-template-columns: 1fr; }
 }
+
+.rating-signin { color: #204c9b; text-decoration: underline; font-size: .875rem; }
+.product-rating-form { display: grid; gap: 6px; border-top: 1px solid #dce4ef; padding-top: 16px; }
+.product-rating-form label { font-size: .875rem; font-weight: 650; }
+.product-rating-form > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.product-rating-form select { padding: 8px 12px; border: 1px solid #dce4ef; border-radius: 8px; background: white; }
+.product-rating-form p { font-size: .875rem; }

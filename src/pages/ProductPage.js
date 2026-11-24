@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Rating from '../components/Rating';
+import ProductRatingForm from '../components/ProductRatingForm';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { detailsProduct } from '../actions/ProdcutActions';
@@ -12,12 +13,15 @@ export default function ProductPage({ match, history }) {
     const dispatch = useDispatch();
     const productID = match.params.id;
     const { loading, error, product } = useSelector(state => state.productDetails);
+    const [savedRating, setSavedRating] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         setQuantity(1);
         dispatch(detailsProduct(productID));
     }, [dispatch, productID]);
+
+    const summary = savedRating?.productId === productID ? savedRating : product;
 
     return (
         <main className="product-detail page-shell">
@@ -30,7 +34,7 @@ export default function ProductPage({ match, history }) {
                     <div className="product-detail-info">
                         <p className="product-detail-category">{product.category}</p>
                         <h1>{product.name}</h1>
-                        {product.numRev > 0 && <Rating rating={product.rating} numRev={product.numRev} />}
+                        <Rating rating={summary.rating} numRev={summary.numRev} />
                         <p className="pd-price">${Number(product.price).toFixed(2)}</p>
                         <p className="product-detail-description">{product.description}</p>
                         <div className="product-purchase">
@@ -52,6 +56,8 @@ export default function ProductPage({ match, history }) {
                                 </div>
                             )}
                         </div>
+                        {product.archived === false && <ProductRatingForm key={productID} productId={productID}
+                            onSaved={rating => setSavedRating({ ...rating, productId: productID })} />}
                     </div>
                 </article>
             )}
